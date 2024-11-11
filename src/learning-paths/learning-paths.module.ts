@@ -4,6 +4,6 @@ import { LearningPathsService } from './learning-paths.service';
 
 @Module({
   controllers: [LearningPathsController],
-  providers: [LearningPathsService]
+  providers: [LearningPathsService],
 })
 export class LearningPathsModule {}

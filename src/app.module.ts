@@ -10,7 +10,13 @@ import { AuthnestService } from './g/authnest/authnest.service';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, CoursesModule, JobsModule, LearningPathsModule],
+  imports: [
+    AuthModule,
+    UsersModule,
+    CoursesModule,
+    JobsModule,
+    LearningPathsModule,
+  ],
   controllers: [AppController],
   providers: [AppService, AuthnestService],
 })
