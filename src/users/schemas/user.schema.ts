@@ -41,6 +41,9 @@ export class User {
     type: [{ type: MongooseSchema.Types.ObjectId, ref: 'LearningPath' }],
   })
   learningPaths: MongooseSchema.Types.ObjectId[];
+    industry: string;
+    experienceLevel: string;
+    id: any;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
