@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { Course } from './schemas/course.schema';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
@@ -25,7 +25,7 @@ export class CoursesService {
 
   async findOne(id: string): Promise<Course> {
     const course = await this.courseRepository.findOne({
-      where: { id },
+      where: { id } as FindOptionsWhere<Course>,
       relations: ['learningPath'],
     });
     if (!course) {

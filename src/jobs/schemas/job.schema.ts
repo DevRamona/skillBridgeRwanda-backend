@@ -1,48 +1,43 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToMany,
-  JoinTable,
-} from 'typeorm';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
 import { User } from '../../users/schemas/user.schema';
 
-@Entity()
-export class Job {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+export type JobDocument = Document & Job;
 
-  @Column()
+@Schema({ timestamps: true })
+export class Job {
+  @Prop({ required: true })
   title: string;
 
-  @Column('text')
+  @Prop({ required: true })
   description: string;
 
-  @Column()
+  @Prop({ required: true })
   company: string;
 
-  @Column()
+  @Prop({ required: true })
   location: string;
 
-  @Column('simple-array')
+  @Prop([String])
   requiredSkills: string[];
 
-  @Column('simple-array')
+  @Prop([String])
   preferredSkills: string[];
 
-  @Column()
+  @Prop({ required: true })
   experienceLevel: string;
 
-  @Column()
+  @Prop({ required: true })
   employmentType: string;
 
-  @Column({ type: 'decimal' })
+  @Prop({ type: Number, required: true })
   salaryRange: number;
 
-  @Column()
+  @Prop({ required: true })
   industry: string;
 
-  @ManyToMany(() => User)
-  @JoinTable()
+  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }] })
   applicants: User[];
 }
+
+export const JobSchema = SchemaFactory.createForClass(Job);

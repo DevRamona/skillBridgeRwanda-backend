@@ -7,7 +7,7 @@ export class CreateCourseDto {
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty({ example: 'Learn the fundamentals of React.js' })
+  @ApiProperty({ example: 'Learn React fundamentals' })
   @IsString()
   @IsNotEmpty()
   description: string;
@@ -17,7 +17,7 @@ export class CreateCourseDto {
   @IsNotEmpty()
   duration: number;
 
-  @ApiProperty({ example: 'uuid-of-learning-path', required: false })
+  @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
   learningPathId?: string;

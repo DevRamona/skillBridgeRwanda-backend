@@ -33,9 +33,11 @@ export class CreateUserDto {
     example: 'student',
     enum: ['student', 'employer', 'educator', 'admin'],
     default: 'student',
+    required: false,
   })
   @IsEnum(['student', 'employer', 'educator', 'admin'])
-  role: string;
+  @IsOptional()
+  role?: string = 'student';
 
   @ApiProperty({
     example: ['JavaScript', 'React'],
@@ -44,6 +46,22 @@ export class CreateUserDto {
   @IsArray()
   @IsOptional()
   skills?: string[];
+
+  @ApiProperty({
+    example: 'Technology',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  industry?: string;
+
+  @ApiProperty({
+    example: 'Mid-level',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  experienceLevel?: string;
 
   @ApiProperty({
     example: {

@@ -1,7 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
+import { LearningPath } from '../../learning-paths/schemas/path.schema';
 
-export type UserDocument = User & Document;
+export type UserDocument = Document & User;
 
 @Schema({ timestamps: true })
 export class User {
@@ -27,23 +28,28 @@ export class User {
   skills: string[];
 
   @Prop({
-    type: [
-      {
-        education: String,
-        experience: String,
-        certifications: [String],
-      },
-    ],
+    type: {
+      education: String,
+      experience: String,
+      certifications: [String],
+    },
   })
-  profile: Record<string, any>;
+  profile: {
+    education: string;
+    experience: string;
+    certifications: string[];
+  };
 
   @Prop({
     type: [{ type: MongooseSchema.Types.ObjectId, ref: 'LearningPath' }],
   })
-  learningPaths: MongooseSchema.Types.ObjectId[];
-    industry: string;
-    experienceLevel: string;
-    id: any;
+  learningPaths: LearningPath[];
+
+  @Prop()
+  industry: string;
+
+  @Prop()
+  experienceLevel: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

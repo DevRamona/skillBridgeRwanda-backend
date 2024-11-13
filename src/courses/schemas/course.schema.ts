@@ -1,20 +1,22 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { LearningPath } from '../../learning-paths/entities/learning-path.entity';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
+import { LearningPath } from '../../learning-paths/schemas/path.schema';
 
-@Entity()
+export type CourseDocument = Course & Document;
+
+@Schema({ timestamps: true })
 export class Course {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
-  @Column()
+  @Prop({ required: true })
   title: string;
 
-  @Column()
+  @Prop({ required: true })
   description: string;
 
-  @Column()
+  @Prop({ required: true })
   duration: number;
 
-  @ManyToOne(() => LearningPath, learningPath => learningPath.courses)
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'LearningPath' })
   learningPath: LearningPath;
 }
+
+export const CourseSchema = SchemaFactory.createForClass(Course);
