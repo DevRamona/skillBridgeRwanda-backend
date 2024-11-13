@@ -1,12 +1,12 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsString,
   IsEmail,
   IsNotEmpty,
-  IsString,
-  IsOptional,
-  IsArray,
   IsEnum,
+  IsArray,
+  IsOptional,
 } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDto {
   @ApiProperty({ example: 'John' })
@@ -19,25 +19,44 @@ export class CreateUserDto {
   @IsNotEmpty()
   lastName: string;
 
-  @ApiProperty({ example: 'john@example.com' })
+  @ApiProperty({ example: 'john.doe@example.com' })
   @IsEmail()
+  @IsNotEmpty()
   email: string;
 
-  @ApiProperty({ example: 'password123' })
+  @ApiProperty({ example: 'strongPassword123' })
   @IsString()
   @IsNotEmpty()
   password: string;
 
-  @ApiProperty({ enum: ['student', 'employer', 'educator', 'admin'] })
+  @ApiProperty({
+    example: 'student',
+    enum: ['student', 'employer', 'educator', 'admin'],
+    default: 'student',
+  })
   @IsEnum(['student', 'employer', 'educator', 'admin'])
   role: string;
 
-  @ApiPropertyOptional({ type: [String] })
+  @ApiProperty({
+    example: ['JavaScript', 'React'],
+    required: false,
+  })
   @IsArray()
   @IsOptional()
   skills?: string[];
 
-  @ApiPropertyOptional()
+  @ApiProperty({
+    example: {
+      education: 'Bachelor in Computer Science',
+      experience: '5 years',
+      certifications: ['AWS Certified Developer'],
+    },
+    required: false,
+  })
   @IsOptional()
-  profile?: Record<string, any>;
+  profile?: {
+    education: string;
+    experience: string;
+    certifications: string[];
+  };
 }
