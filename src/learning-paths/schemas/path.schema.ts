@@ -7,6 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Course } from 'src/courses/schemas/course.schema';
 import { User } from 'src/users/schemas/user.schema';
 
 @Entity()
