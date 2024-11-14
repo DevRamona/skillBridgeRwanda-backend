@@ -1,11 +1,15 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 import { LearningPathsController } from './learning-paths.controller';
 import { LearningPathsService } from './learning-paths.service';
-import { LearningPath } from './schemas/path.schema';
+import { LearningPath, LearningPathSchema } from './schemas/path.schema';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([LearningPath])],
+  imports: [
+    MongooseModule.forFeature([
+      { name: LearningPath.name, schema: LearningPathSchema },
+    ]),
+  ],
   controllers: [LearningPathsController],
   providers: [LearningPathsService],
   exports: [LearningPathsService],

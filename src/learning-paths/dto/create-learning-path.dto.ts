@@ -1,15 +1,19 @@
-import { IsString, IsNotEmpty, IsArray, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsArray,
+  IsNumber,
+  IsOptional,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateLearningPathDto {
-  @ApiProperty({ example: 'Full Stack Development Path' })
+  @ApiProperty({ example: 'Full Stack Development' })
   @IsString()
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty({
-    example: 'Comprehensive path to become a full stack developer',
-  })
+  @ApiProperty({ example: 'Complete path to become a full stack developer' })
   @IsString()
   @IsNotEmpty()
   description: string;
@@ -29,13 +33,13 @@ export class CreateLearningPathDto {
   @IsNotEmpty()
   careerTrack: string;
 
-  @ApiProperty({ example: ['JavaScript', 'HTML', 'CSS'] })
+  @ApiProperty({ example: ['JavaScript', 'React', 'Node.js'] })
   @IsArray()
   @IsString({ each: true })
   requiredSkills: string[];
 
   @ApiProperty({
-    example: ['Build full-stack applications', 'Deploy web applications'],
+    example: ['Build full stack applications', 'Deploy web apps'],
   })
   @IsArray()
   @IsString({ each: true })
@@ -46,11 +50,18 @@ export class CreateLearningPathDto {
   @IsNotEmpty()
   industry: string;
 
-  @ApiProperty({ example: 0, required: false })
+  @ApiProperty({ required: false })
+  @IsArray()
+  @IsOptional()
+  courses?: string[];
+
+  @ApiProperty({ required: false })
+  @IsNumber()
   @IsOptional()
   popularity?: number;
 
-  @ApiProperty({ example: 0, required: false })
+  @ApiProperty({ required: false })
+  @IsNumber()
   @IsOptional()
   rating?: number;
 }

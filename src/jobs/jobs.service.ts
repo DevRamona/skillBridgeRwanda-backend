@@ -53,7 +53,7 @@ export class JobsService {
     const job = await this.findOne(jobId);
 
     const alreadyApplied = job.applicants?.some(
-      (applicant) => applicant._id.toString() === user._id.toString(),
+      (applicant) => applicant.id.toString() === user.id.toString(),
     );
 
     if (alreadyApplied) {
@@ -63,7 +63,7 @@ export class JobsService {
     return this.jobModel
       .findByIdAndUpdate(
         jobId,
-        { $push: { applicants: user._id } },
+        { $push: { applicants: user.id } },
         { new: true },
       )
       .populate('applicants', '-password')
@@ -85,6 +85,7 @@ export class JobsService {
   private calculateMatchScore(user: User, job: Job): number {
     let score = 0;
 
+    // Match required skills
     const userSkills = new Set(user.skills || []);
     job.requiredSkills.forEach((skill) => {
       if (userSkills.has(skill)) {
@@ -92,15 +93,19 @@ export class JobsService {
       }
     });
 
+    // Match preferred skills
     job.preferredSkills.forEach((skill) => {
       if (userSkills.has(skill)) {
         score += 1;
       }
     });
 
+    // Match industry
     if (user.industry === job.industry) {
       score += 2;
     }
+
+    // Match experience level
     if (user.experienceLevel === job.experienceLevel) {
       score += 1;
     }

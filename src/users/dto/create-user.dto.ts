@@ -7,6 +7,7 @@ import {
   IsOptional,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Role } from 'src/roles/role.enum';
 
 export class CreateUserDto {
   @ApiProperty({ example: 'John' })
@@ -30,14 +31,14 @@ export class CreateUserDto {
   password: string;
 
   @ApiProperty({
-    example: 'student',
-    enum: ['student', 'employer', 'educator', 'admin'],
-    default: 'student',
+    example: Role.STUDENT,
+    enum: Role,
+    default: Role.STUDENT,
     required: false,
   })
-  @IsEnum(['student', 'employer', 'educator', 'admin'])
+  @IsEnum(Role)
   @IsOptional()
-  role?: string = 'student';
+  role?: Role = Role.STUDENT;
 
   @ApiProperty({
     example: ['JavaScript', 'React'],
@@ -46,22 +47,6 @@ export class CreateUserDto {
   @IsArray()
   @IsOptional()
   skills?: string[];
-
-  @ApiProperty({
-    example: 'Technology',
-    required: false,
-  })
-  @IsString()
-  @IsOptional()
-  industry?: string;
-
-  @ApiProperty({
-    example: 'Mid-level',
-    required: false,
-  })
-  @IsString()
-  @IsOptional()
-  experienceLevel?: string;
 
   @ApiProperty({
     example: {

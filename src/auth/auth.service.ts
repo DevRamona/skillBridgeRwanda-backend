@@ -1,9 +1,11 @@
+
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
-import * as bcrypt from 'bcrypt';
-import { LoginDto } from 'src/dto/login.dto';
 import { RegisterDto } from 'src/dto/register.dto';
+import { LoginDto } from 'src/dto/login.dto';
+import * as bcrypt from 'bcrypt';
+import { User, UserDocument } from './../users/schemas/user.schema';
 
 @Injectable()
 export class AuthService {
@@ -13,29 +15,57 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto) {
-    const user = await this.usersService.create(registerDto);
-    const token = this.generateToken(user);
-    return { user, token };
+    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+
+    const user = (await this.usersService.create({
+      ...registerDto,
+      password: hashedPassword,
+    })) as UserDocument;
+
+    // Using type assertion and excluding password
+    const userObject = user.toObject();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: _pass, ...result } = userObject;
+
+    return result;
   }
 
   async login(loginDto: LoginDto) {
-    const user = await this.validateUser(loginDto.email, loginDto.password);
+    const user = await this.usersService.findByEmail(loginDto.email);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    const token = this.generateToken(user);
-    return { user, token };
+
+    const isPasswordValid = await bcrypt.compare(
+      loginDto.password,
+      user.password,
+    );
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const payload = {
+      email: user.email,
+      sub: user.id,
+      role: user.role,
+    };
+
+    const userObject = (user as UserDocument).toObject();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: _pass, ...userWithoutPassword } = userObject;
+
+    return {
+      access_token: this.jwtService.sign(payload),
+      user: userWithoutPassword,
+    };
   }
 
-  private generateToken(user: any) {
-    const payload = { email: user.email, sub: user._id, role: user.role };
-    return this.jwtService.sign(payload);
-  }
-
-  private async validateUser(email: string, password: string) {
+  async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
     if (user && (await bcrypt.compare(password, user.password))) {
-      const { password, ...result } = user;
+      const userObject = (user as UserDocument).toObject();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password: _pass, ...result } = userObject;
       return result;
     }
     return null;

@@ -1,11 +1,26 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
 import { LearningPath } from '../../learning-paths/schemas/path.schema';
+import { Role } from 'src/roles/role.enum';
 
-export type UserDocument = Document & User;
+export type UserDocument = User & Document;
 
-@Schema({ timestamps: true })
+@Schema({
+  timestamps: true,
+  toObject: { virtuals: true },
+  toJSON: {
+    virtuals: true,
+    transform: (doc, ret) => {
+      ret.id = ret._id;
+      delete ret._id;
+      delete ret.__v;
+      return ret;
+    },
+  },
+})
 export class User {
+  id?: string; // Virtual property for _id
+
   @Prop({ required: true })
   firstName: string;
 
@@ -19,10 +34,11 @@ export class User {
   password: string;
 
   @Prop({
-    enum: ['student', 'employer', 'educator', 'admin'],
-    default: 'student',
+    type: String,
+    enum: Role,
+    default: Role.STUDENT,
   })
-  role: string;
+  role: Role;
 
   @Prop([String])
   skills: string[];
@@ -53,3 +69,12 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+// Virtuals for `id`
+UserSchema.virtual('id').get(function () {
+  return this._id.toHexString();
+});
+
+// Ensure virtuals are included in `toObject` and `toJSON` output
+UserSchema.set('toObject', { virtuals: true });
+UserSchema.set('toJSON', { virtuals: true });

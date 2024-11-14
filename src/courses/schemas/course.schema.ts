@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
-import { LearningPath } from '../../learning-paths/schemas/path.schema';
+import { LearningPath } from 'src/learning-paths/schemas/path.schema';
 
 export type CourseDocument = Course & Document;
 

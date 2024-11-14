@@ -1,61 +1,48 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  ManyToMany,
-  JoinTable,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import { Course } from 'src/courses/schemas/course.schema';
-import { User } from 'src/users/schemas/user.schema';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Course } from '../../courses/schemas/course.schema';
+import { User } from '../../users/schemas/user.schema';
 
-@Entity()
+export type LearningPathDocument = LearningPath & Document;
+
+@Schema({ timestamps: true })
 export class LearningPath {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
-  @Column()
+  [x: string]: any;
+  @Prop({ required: true })
   title: string;
 
-  @Column('text')
+  @Prop({ required: true })
   description: string;
 
-  @Column()
+  @Prop({ required: true })
   skillLevel: string;
 
-  @Column()
+  @Prop({ required: true })
   estimatedDuration: string;
 
-  @Column()
+  @Prop({ required: true })
   careerTrack: string;
 
-  @Column('simple-array')
+  @Prop([String])
   requiredSkills: string[];
 
-  @Column('simple-array')
+  @Prop([String])
   outcomes: string[];
 
-  @Column()
+  @Prop({ required: true })
   industry: string;
 
-  @ManyToMany(() => Course)
-  @JoinTable()
+  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'Course' }] })
   courses: Course[];
 
-  @ManyToMany(() => User)
-  @JoinTable()
+  @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }] })
   enrolledUsers: User[];
 
-  @Column({ default: 0 })
+  @Prop({ default: 0 })
   popularity: number;
 
-  @Column({ type: 'decimal', default: 0 })
+  @Prop({ type: Number, default: 0 })
   rating: number;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 }
+
+export const LearningPathSchema = SchemaFactory.createForClass(LearningPath);
