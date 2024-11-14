@@ -27,6 +27,9 @@ import {
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
+  getUserSkills(userId: string): any {
+    throw new Error('Method not implemented.');
+  }
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
@@ -116,7 +119,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Return user profile.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
   async getProfile(@Param('id') id: string) {
-    const user = await this.usersService.findOne(id);
+   const user = await this.usersService.findOne(id);
     return user.profile || {};
   }
 }

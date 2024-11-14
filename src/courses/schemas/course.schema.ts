@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
-import { LearningPath } from 'src/learning-paths/schemas/path.schema';
+import { LearningPath } from '../../mocks/learning-path.mock';
 
 export type CourseDocument = Course & Document;
 
@@ -12,11 +12,20 @@ export class Course {
   @Prop({ required: true })
   description: string;
 
-  @Prop({ required: true })
-  duration: number;
-
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'LearningPath' })
   learningPath: LearningPath;
+
+  @Prop({ required: true })
+  duration: string;
+
+  @Prop({ required: true })
+  level: string;
+
+  @Prop([String])
+  topics: string[];
+
+  @Prop({ required: true })
+  instructor: string;
 }
 
 export const CourseSchema = SchemaFactory.createForClass(Course);
