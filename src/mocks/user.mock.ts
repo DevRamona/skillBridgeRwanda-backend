@@ -1,4 +1,4 @@
-import { Role } from 'src/roles/role.enum';
+import { Role } from '../roles/role.enum';
 
 export const mockUser = {
   email: 'test@example.com',
@@ -23,5 +23,6 @@ export const mockUserModel = {
   findByIdAndUpdate: jest.fn().mockReturnThis(),
   findByIdAndDelete: jest.fn().mockReturnThis(),
   exec: jest.fn().mockResolvedValue([mockUser]),
+  select: jest.fn().mockReturnThis(),
   populate: jest.fn().mockReturnThis(),
 };

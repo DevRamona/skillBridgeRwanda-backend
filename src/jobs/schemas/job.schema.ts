@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
 import { User } from '../../users/schemas/user.schema';
 
-export type JobDocument = Document & Job;
+export type JobDocument = Job & Document;
 
 @Schema({ timestamps: true })
 export class Job {
@@ -10,19 +10,16 @@ export class Job {
   title: string;
 
   @Prop({ required: true })
-  description: string;
+  company: string;
 
   @Prop({ required: true })
-  company: string;
+  description: string;
 
   @Prop({ required: true })
   location: string;
 
-  @Prop([String])
-  requiredSkills: string[];
-
-  @Prop([String])
-  preferredSkills: string[];
+  @Prop({ required: true })
+  industry: string;
 
   @Prop({ required: true })
   experienceLevel: string;
@@ -30,14 +27,23 @@ export class Job {
   @Prop({ required: true })
   employmentType: string;
 
-  @Prop({ type: Number, required: true })
-  salaryRange: number;
+  @Prop()
+  salary: string;
 
-  @Prop({ required: true })
-  industry: string;
+  @Prop([String])
+  requirements: string[];
+
+  @Prop([String])
+  responsibilities: string[];
 
   @Prop({ type: [{ type: MongooseSchema.Types.ObjectId, ref: 'User' }] })
   applicants: User[];
+
+  @Prop({ default: true })
+  isActive: boolean;
+
+  @Prop()
+  deadline: Date;
 }
 
 export const JobSchema = SchemaFactory.createForClass(Job);

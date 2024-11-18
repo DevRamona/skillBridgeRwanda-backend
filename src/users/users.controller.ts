@@ -7,119 +7,80 @@ import {
   Param,
   Delete,
   UseGuards,
-  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { JwtAuthGuard } from 'src/auth/auth-guard';
+import { JwtAuthGuard } from '../auth/auth-guard';
 import { RolesGuard } from 'src/roles/roles.guard';
 import { Roles } from 'src/roles/roles.decorator';
 import { Role } from 'src/roles/role.enum';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { User } from './schemas/user.schema';
 
-@ApiTags('users')
 @Controller('users')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class UsersController {
-  getUserSkills(userId: string): any {
-    throw new Error('Method not implemented.');
-  }
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create a new user' })
-  @ApiResponse({ status: 201, description: 'User successfully created.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @ApiResponse({ status: 403, description: 'Forbidden.' })
-  create(@Body() createUserDto: CreateUserDto) {
+  async create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get all users' })
-  @ApiResponse({ status: 200, description: 'Return all users.' })
-  @ApiQuery({
-    name: 'role',
-    required: false,
-    enum: Role,
-  })
-  findAll(@Query('role') role?: Role) {
-    return this.usersService.findAll(role);
+  async findAll() {
+    return this.usersService.findAll();
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get a user by id' })
-  @ApiResponse({ status: 200, description: 'Return the user.' })
-  @ApiResponse({ status: 404, description: 'User not found.' })
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+  async findById(@Param('id') id: string) {
+    return this.usersService.findById(id);
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update a user' })
-  @ApiResponse({ status: 200, description: 'User successfully updated.' })
-  @ApiResponse({ status: 404, description: 'User not found.' })
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Delete a user' })
-  @ApiResponse({ status: 200, description: 'User successfully deleted.' })
-  @ApiResponse({ status: 404, description: 'User not found.' })
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
     return this.usersService.remove(id);
   }
 
-  @Get(':id/learning-paths')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get user learning paths' })
-  @ApiResponse({ status: 200, description: 'Return user learning paths.' })
-  @ApiResponse({ status: 404, description: 'User not found.' })
-  getLearningPaths(@Param('id') id: string) {
-    return this.usersService.getLearningPaths(id);
+  @Patch(':id/profile')
+  async updateProfile(
+    @Param('id') id: string,
+    @Body() profileData: Partial<User['profile']>,
+  ) {
+    return this.usersService.updateProfile(id, profileData);
   }
 
-  @Get(':id/skills')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get user skills' })
-  @ApiResponse({ status: 200, description: 'Return user skills.' })
-  @ApiResponse({ status: 404, description: 'User not found.' })
-  async getSkills(@Param('id') id: string) {
-    const user = await this.usersService.findOne(id);
-    return user.skills || [];
+  @Post(':id/skills')
+  async addSkill(@Param('id') id: string, @Body('skill') skill: string) {
+    return this.usersService.addSkill(id, skill);
   }
 
-  @Get(':id/profile')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get user profile' })
-  @ApiResponse({ status: 200, description: 'Return user profile.' })
-  @ApiResponse({ status: 404, description: 'User not found.' })
-  async getProfile(@Param('id') id: string) {
-   const user = await this.usersService.findOne(id);
-    return user.profile || {};
+  @Delete(':id/skills/:skill')
+  async removeSkill(@Param('id') id: string, @Param('skill') skill: string) {
+    return this.usersService.removeSkill(id, skill);
+  }
+
+  @Post(':id/courses/:courseId/enroll')
+  async enrollInCourse(
+    @Param('id') userId: string,
+    @Param('courseId') courseId: string,
+  ) {
+    return this.usersService.enrollInCourse(userId, courseId);
+  }
+
+  @Delete(':id/courses/:courseId/unenroll')
+  async unenrollFromCourse(
+    @Param('id') userId: string,
+    @Param('courseId') courseId: string,
+  ) {
+    return this.usersService.unenrollFromCourse(userId, courseId);
   }
 }
