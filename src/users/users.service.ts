@@ -8,7 +8,6 @@ import { Model } from 'mongoose';
 import { User, UserDocument } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -20,10 +19,10 @@ export class UsersService {
       throw new ConflictException('Email already exists');
     }
 
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    // Store password as plain text without hashing
     const createdUser = new this.userModel({
       ...createUserDto,
-      password: hashedPassword,
+      // No password hashing
     });
 
     return createdUser.save();
@@ -32,7 +31,7 @@ export class UsersService {
   async findAll(): Promise<User[]> {
     return this.userModel
       .find()
-      .select('-password')
+      .select('-password') // Exclude password from results
       .populate('enrolledCourses')
       .exec();
   }
@@ -40,7 +39,7 @@ export class UsersService {
   async findById(id: string): Promise<User> {
     const user = await this.userModel
       .findById(id)
-      .select('-password')
+      .select('-password') // Exclude password from results
       .populate('enrolledCourses')
       .exec();
 
@@ -51,18 +50,15 @@ export class UsersService {
     return user;
   }
 
-  async findByEmail(email: string): Promise<User | null> {
+  async findByEmail(email: string): Promise<UserDocument | null> {
     return this.userModel.findOne({ email }).exec();
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    if (updateUserDto.password) {
-      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
-    }
-
+    // No password hashing
     const updatedUser = await this.userModel
       .findByIdAndUpdate(id, updateUserDto, { new: true })
-      .select('-password')
+      .select('-password') // Exclude password from results
       .exec();
 
     if (!updatedUser) {
@@ -85,7 +81,7 @@ export class UsersService {
   ): Promise<User> {
     const user = await this.userModel
       .findByIdAndUpdate(id, { $set: { profile: profileData } }, { new: true })
-      .select('-password')
+      .select('-password') // Exclude password from results
       .exec();
 
     if (!user) {
@@ -98,7 +94,7 @@ export class UsersService {
   async addSkill(id: string, skill: string): Promise<User> {
     const user = await this.userModel
       .findByIdAndUpdate(id, { $addToSet: { skills: skill } }, { new: true })
-      .select('-password')
+      .select('-password') // Exclude password from results
       .exec();
 
     if (!user) {
@@ -111,7 +107,7 @@ export class UsersService {
   async removeSkill(id: string, skill: string): Promise<User> {
     const user = await this.userModel
       .findByIdAndUpdate(id, { $pull: { skills: skill } }, { new: true })
-      .select('-password')
+      .select('-password') // Exclude password from results
       .exec();
 
     if (!user) {
@@ -128,7 +124,7 @@ export class UsersService {
         { $addToSet: { enrolledCourses: courseId } },
         { new: true },
       )
-      .select('-password')
+      .select('-password') // Exclude password from results
       .populate('enrolledCourses')
       .exec();
 
@@ -146,7 +142,7 @@ export class UsersService {
         { $pull: { enrolledCourses: courseId } },
         { new: true },
       )
-      .select('-password')
+      .select('-password') // Exclude password from results
       .populate('enrolledCourses')
       .exec();
 
