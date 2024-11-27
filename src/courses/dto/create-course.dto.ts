@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCourseDto {
@@ -17,8 +17,18 @@ export class CreateCourseDto {
   @IsNotEmpty()
   duration: number;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({ example: '60d5ec49f1b2c8b1f8c8e8e8', required: true }) // Example ObjectId
   @IsString()
-  @IsOptional()
-  learningPathId?: string;
+  @IsNotEmpty()
+  learningPathId: string;
+
+  @ApiProperty({ example: 'Beginner', required: true })
+  @IsString()
+  @IsNotEmpty()
+  level: string;
+
+  @ApiProperty({ example: 'John Doe', required: true })
+  @IsString()
+  @IsNotEmpty()
+  instructor: string;
 }

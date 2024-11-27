@@ -25,8 +25,8 @@ export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  // @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new course' })
   @ApiResponse({ status: 201, description: 'Course successfully created.' })
   create(@Body() createCourseDto: CreateCourseDto) {

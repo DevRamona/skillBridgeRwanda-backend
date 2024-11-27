@@ -8,8 +8,8 @@ import { LearningPathsModule } from './learning-paths/learning-paths.module';
 import { JobsModule } from './jobs/jobs.module';
 import { CoursesModule } from './courses/courses.module';
 import { UsersModule } from './users/users.module';
-import { RolesGuard } from './roles/roles.guard'; // Updated path
-import { APP_GUARD } from '@nestjs/core';
+// import { RolesGuard } from './roles/roles.guard'; // Updated path
+// import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -41,10 +41,10 @@ import { APP_GUARD } from '@nestjs/core';
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: RolesGuard,
+    // },
   ],
 })
 export class AppModule {}
