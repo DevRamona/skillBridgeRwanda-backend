@@ -22,7 +22,7 @@ async function bootstrap() {
 
   // Enable CORS
   app.enableCors({
-    origin: ['https://skillbridgerwanda.onrender.com'],
+    origin: 'https://skillbridgerwanda.onrender.com',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
