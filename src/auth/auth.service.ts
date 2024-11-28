@@ -9,7 +9,6 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { RegisterDto } from 'src/dto/register.dto';
 import { LoginDto } from 'src/dto/login.dto';
-import { UserDocument } from '../users/schemas/user.schema';
 
 @Injectable()
 export class AuthService {
@@ -30,19 +29,25 @@ export class AuthService {
         throw new HttpException('Email already exists', HttpStatus.CONFLICT);
       }
 
-      // Create the user without hashing the password
-      const user = (await this.usersService.create({
-        ...registerDto,
-        // Store password as plain text
-      })) as UserDocument;
+      // Create the user with plain password
+      const user = await this.usersService.create(registerDto);
 
       this.logger.log(`User registered: ${user.email}`);
 
-      const { password: _password, ...result } = user.toObject();
+      // Ensure user is properly converted to object before destructuring
+      const userObject = user.toObject ? user.toObject() : user;
+      const { password: _password, ...result } = userObject;
+
       return result;
     } catch (error) {
       this.logger.error(`Registration error: ${error.message}`);
-      throw error;
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        'Registration failed',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -56,11 +61,8 @@ export class AuthService {
         );
         throw new UnauthorizedException('Invalid credentials');
       }
-      console.log(user);
 
-      // Directly compare the provided password with the stored password
-      const isPasswordValid = loginDto.password === user.password; // Compare plain text passwords
-      this.logger.debug(`Password Comparison Result: ${isPasswordValid}`);
+      const isPasswordValid = loginDto.password === user.password;
 
       if (!isPasswordValid) {
         this.logger.warn(`Failed login attempt for email: ${loginDto.email}`);
@@ -69,11 +71,13 @@ export class AuthService {
 
       const payload = {
         email: user.email,
-        id: user.id,
+        sub: user._id, // Changed from user.id to user._id for MongoDB
         role: user.role,
       };
 
-      const userWithoutPassword = user.toObject();
+      // Ensure user is properly converted to object before destructuring
+      const userObject = user.toObject ? user.toObject() : user;
+      const { password: _password, ...userWithoutPassword } = userObject;
 
       return {
         access_token: this.jwtService.sign(payload),
@@ -81,16 +85,19 @@ export class AuthService {
       };
     } catch (error) {
       this.logger.error(`Login error: ${error.message}`);
-      throw error;
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+      throw new HttpException('Login failed', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
   async validateUser(email: string, password: string): Promise<any> {
     try {
       const user = await this.usersService.findByEmail(email);
-      if (user && password === user.password) {
-        // Directly compare plain text passwords
-        const { password: _password, ...result } = user.toObject();
+      if (user && user.password === password) {
+        const userObject = user.toObject ? user.toObject() : user;
+        const { password: _password, ...result } = userObject;
         return result;
       }
       return null;
