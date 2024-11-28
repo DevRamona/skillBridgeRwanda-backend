@@ -56,6 +56,7 @@ export class AuthService {
         );
         throw new UnauthorizedException('Invalid credentials');
       }
+      console.log(user);
 
       // Directly compare the provided password with the stored password
       const isPasswordValid = loginDto.password === user.password; // Compare plain text passwords
@@ -68,11 +69,11 @@ export class AuthService {
 
       const payload = {
         email: user.email,
-        sub: user.id,
+        id: user.id,
         role: user.role,
       };
 
-      const { ...userWithoutPassword } = user.toObject();
+      const userWithoutPassword = user.toObject();
 
       return {
         access_token: this.jwtService.sign(payload),
